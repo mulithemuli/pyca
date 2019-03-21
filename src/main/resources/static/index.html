@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+    <meta name="theme-color" content="#ffffff">
+
+    <title>Private YouTube Comment App</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Great+Vibes" rel="stylesheet">
+    <link href="/webjars/materializecss/1.0.0/css/materialize.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+<header>
+    <nav class="blue lighten-1" role="navigation">
+        <div class="nav-wrapper container">
+            <span class="brand-logo right hide-on-med-and-down center-align">Private YouTube Comment App</span>
+            <span class="brand-logo right hide-on-large-only hide-on-extra-large-only">PYCA</span>
+            <ul class="left">
+                <li ><a href="/" class="nav-link"><i class="material-icons">chevron_left</i></a></li>
+            </ul>
+        </div>
+    </nav>
+</header>
+<main>
+    <div class="section no-pad-bot">
+        <div class="container">
+            <div class="row">
+                <div class="input-field col s2 left">
+                    <a class="btn-floating waves-effect waves-light light-blue darken-2 add-video"><i class="material-icons">add</i></a>
+                </div>
+                <div class="input-field col s10 m6 l4 right">
+                    <i class="material-icons prefix">account_circle</i>
+                    <input id="author" type="text" class="validate" required>
+                    <label for="author">Write as</label>
+                </div>
+            </div>
+            <div class="content" id="content"></div>
+        </div>
+    </div>
+</main>
+<footer class="page-footer green lighten-2">
+    <div class="footer-copyright">
+        <div class="container white-text">
+            Made by <a href="https://mulithemuli.at" target="_blank" class="light-blue-text text-lighten-4">Phil</a>
+        </div>
+    </div>
+</footer>
+
+
+<script src="/webjars/jquery/3.3.1-2/jquery.min.js"></script>
+<script src="/webjars/materializecss/1.0.0/js/materialize.min.js"></script>
+<script src="/webjars/mustache/2.3.0/mustache.min.js"></script>
+<script src="js/script.js"></script>
+
+</body>
+</html>

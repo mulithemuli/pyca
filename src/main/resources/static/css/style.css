@@ -1,0 +1,14 @@
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+#add_video_container .actions {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
