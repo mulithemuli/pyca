@@ -31,13 +31,13 @@ public class YouTubeController {
     @RequestMapping(path = "/video", method = RequestMethod.GET)
     public ResponseEntity<YouTubeInfo> loadVideoInfo(@RequestParam("url") String url) {
         try {
+            URL originalUrl = new URL(url);
             Document document = Jsoup.connect(url).get();
             Elements elements = document.select("title");
             String title = elements.first().text().replace(" - YouTube", "");
             if ("YouTube".equals(title.trim()) || "".equals(title.trim())) {
                 return ResponseEntity.notFound().build();
             }
-            URL originalUrl = new URL(url);
             String videoId = null;
             for (String paramValue : originalUrl.getQuery().split("&")) {
                 String[] param = paramValue.split("=");
