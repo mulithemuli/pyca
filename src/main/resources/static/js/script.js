@@ -94,8 +94,8 @@
 </div>',
         listVideo: '<a class="collection-item" href="/video/{{videoId}}">\
     <span class="badge">0</span>\
-    <div class="title"><strong>{{title}}</strong></div>\
-    <div>{{author}}</div>\
+    <div class="title light-blue-text darken-2"><strong>{{title}}</strong></div>\
+    <div class="light-blue-text darken-1">{{author}}</div>\
 </a>'
     }
 }(window.pyca = window.pyca || {}, jQuery));
