@@ -1,10 +1,13 @@
 package at.muli.pyca.controller;
 
 import at.muli.pyca.bo.YouTubeInfo;
+import at.muli.pyca.po.Video;
+import at.muli.pyca.repository.VideoRepository;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +18,12 @@ import java.net.URL;
 @RestController
 @RequestMapping("/api")
 public class YouTubeController {
+
+    private VideoRepository videoRepository;
+
+    public YouTubeController(VideoRepository videoRepository) {
+        this.videoRepository = videoRepository;
+    }
 
     @RequestMapping(path = "/video", method = RequestMethod.GET)
     public ResponseEntity<YouTubeInfo> loadVideoInfo(@RequestParam("url") String url) {
@@ -43,6 +52,11 @@ public class YouTubeController {
 
     @RequestMapping(path = "/video", method = RequestMethod.POST)
     public ResponseEntity<YouTubeInfo> saveVideo(@RequestBody YouTubeInfo youTubeInfo) {
+        Video video = videoRepository.findByVideoId(youTubeInfo.getVideoId());
+        if (video != null) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+        videoRepository.save(youTubeInfo.toVideo());
         return ResponseEntity.ok(youTubeInfo);
     }
 }

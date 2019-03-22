@@ -47,7 +47,10 @@
                         data: JSON.stringify(data),
                         dataType: 'json',
                         processData: false
-                    }).done(res => console.log(res));
+                    }).done((res, textStatus, xhr) => {
+                        console.log(xhr.status);
+                        console.log(res);
+                    });
                 })
             });
         });
