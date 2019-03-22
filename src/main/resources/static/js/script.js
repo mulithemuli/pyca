@@ -8,6 +8,10 @@
 
     $('a.nav-link').on('click', e => e.preventDefault());
 
+    $(elements.videos).click('a.video-details', e => {
+        e.preventDefault();
+    });
+
     $('a.add-video').on('click', e => {
         e.preventDefault();
         let addVideoContainer = document.getElementById('add_video_container');
@@ -99,7 +103,7 @@
     <div class="video-container hide"></div>\
     <div class="actions"><a class="btn waves-effect waves-light light-blue darken-2 save-video"><i class="material-icons right">save</i>Save </a></div>\
 </div>',
-        listVideo: '<a class="collection-item" href="/video/{{videoId}}" name="{{videoId}}">\
+        listVideo: '<a class="collection-item video-details" href="/video/{{videoId}}" name="{{videoId}}">\
     <span class="badge">0</span>\
     <div class="title light-blue-text darken-2"><strong>{{title}}</strong></div>\
     <div class="light-blue-text darken-1">{{author}}</div>\
