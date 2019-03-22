@@ -9,10 +9,13 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
@@ -58,5 +61,11 @@ public class YouTubeController {
         }
         videoRepository.save(youTubeInfo.toVideo());
         return ResponseEntity.ok(youTubeInfo);
+    }
+
+    @Transactional(readOnly = true)
+    @RequestMapping(path = "/videos", method = RequestMethod.GET)
+    public List<YouTubeInfo> loadVideos() {
+        return videoRepository.findAllByOrderByDateAddDesc().map(YouTubeInfo::fromVideo).collect(Collectors.toList());
     }
 }

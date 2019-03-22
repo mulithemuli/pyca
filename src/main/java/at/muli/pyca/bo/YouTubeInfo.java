@@ -30,4 +30,14 @@ public class YouTubeInfo {
                 .dateAdd(Instant.now())
                 .build();
     }
+
+    public static YouTubeInfo fromVideo(Video video) {
+        return builder()
+                .title(video.getTitle())
+                .url(video.getUrl())
+                .embed(video.getEmbed())
+                .videoId(video.getVideoId())
+                .author(video.getAuthor())
+                .build();
+    }
 }

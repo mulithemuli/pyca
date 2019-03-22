@@ -3,6 +3,7 @@
     let elements = {
         content: $('#content'),
         author: $('#author'),
+        videos: $('#videos')
     };
 
     $('a.nav-link').on('click', e => e.preventDefault());
@@ -72,6 +73,12 @@
     $(() => {
         elements.author.val(storage.get('author'));
         M.updateTextFields();
+        $.get('/api/videos').done(videos => {
+            $.each(videos, (i, video) => {
+                elements.videos.append($(Mustache.render(templates.listVideo, video)));
+                console.log(video);
+            });
+        });
     });
 
     let templates = {
@@ -84,6 +91,11 @@
     <h6 class="hide"></h6> \
     <div class="video-container hide"></div>\
     <div class="actions"><a class="btn waves-effect waves-light light-blue darken-2 save-video"><i class="material-icons right">save</i>Save </a></div>\
-</div>'
+</div>',
+        listVideo: '<a class="collection-item" href="/video/{{videoId}}">\
+    <span class="badge">0</span>\
+    <div class="title"><strong>{{title}}</strong></div>\
+    <div>{{author}}</div>\
+</a>'
     }
 }(window.pyca = window.pyca || {}, jQuery));
