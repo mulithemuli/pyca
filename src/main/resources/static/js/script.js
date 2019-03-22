@@ -15,7 +15,8 @@
             $('#url', addVideoContainer).focus();
             return;
         }
-        elements.content.prepend($(templates.addVideo));
+        addVideoContainer = $(templates.addVideo);
+        elements.content.prepend(addVideoContainer);
         let title = $('h6', addVideoContainer);
         let video = $('.video-container', addVideoContainer);
         let save = $('a.save-video', addVideoContainer);
@@ -49,8 +50,14 @@
                         dataType: 'json',
                         processData: false
                     }).done((res, textStatus, xhr) => {
-                        console.log(xhr.status);
-                        console.log(res);
+                        if (xhr.status === 200) {
+                            elements.videos.prepend($(Mustache.render(templates.listVideo, res)));
+                        } else if (xhr.status === 304) {
+                            let item = $('a[name=' + data.videoId + ']');
+                            item.addClass('tag-existing');
+                            setTimeout(() => item.removeClass('tag-existing'), 1000);
+                        }
+                        $(addVideoContainer).remove();
                     });
                 })
             });
@@ -92,7 +99,7 @@
     <div class="video-container hide"></div>\
     <div class="actions"><a class="btn waves-effect waves-light light-blue darken-2 save-video"><i class="material-icons right">save</i>Save </a></div>\
 </div>',
-        listVideo: '<a class="collection-item" href="/video/{{videoId}}">\
+        listVideo: '<a class="collection-item" href="/video/{{videoId}}" name="{{videoId}}">\
     <span class="badge">0</span>\
     <div class="title light-blue-text darken-2"><strong>{{title}}</strong></div>\
     <div class="light-blue-text darken-1">{{author}}</div>\
