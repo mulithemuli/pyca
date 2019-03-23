@@ -28,6 +28,16 @@ public class YouTubeController {
         this.videoRepository = videoRepository;
     }
 
+    @RequestMapping(path = "/video/{videoId}", method = RequestMethod.GET)
+    public ResponseEntity<YouTubeInfo> loadVideoInfoById(@PathVariable("videoId") String videoId) {
+        log.info(videoId);
+        YouTubeInfo youTubeInfo = YouTubeInfo.fromVideo(videoRepository.findByVideoId(videoId));
+        if (youTubeInfo == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(youTubeInfo);
+    }
+
     @RequestMapping(path = "/video", method = RequestMethod.GET)
     public ResponseEntity<YouTubeInfo> loadVideoInfo(@RequestParam("url") String url) {
         try {

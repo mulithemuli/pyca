@@ -10,6 +10,11 @@
 
     $(elements.videos).click('a.video-details', e => {
         e.preventDefault();
+        let link = $(e.target);
+        if (!link.is('a')) {
+            link = link.parents('a');
+        }
+        $.get('/api' + link.attr('href')).done(data => console.log(data));
     });
 
     $('a.add-video').on('click', e => {
@@ -87,7 +92,6 @@
         $.get('/api/videos').done(videos => {
             $.each(videos, (i, video) => {
                 elements.videos.append($(Mustache.render(templates.listVideo, video)));
-                console.log(video);
             });
         });
     });
@@ -105,8 +109,15 @@
 </div>',
         listVideo: '<a class="collection-item video-details" href="/video/{{videoId}}" name="{{videoId}}">\
     <span class="badge">0</span>\
+    <span class="badge new green lighten-2">1</span>\
     <div class="title light-blue-text darken-2"><strong>{{title}}</strong></div>\
     <div class="light-blue-text darken-1">{{author}}</div>\
-</a>'
+</a>',
+        detailVideoContainer: '<div class="fullscreen-container">\
+    <h2><a href="{{url}}" target="_blank">{{title}}</a></h2>\
+    <span>{{author}}</span>\
+    <div class="video-container"><iframe src="{{embed}}" width="853" height="480" frameborder="0" allowfullscreen></div>\
+    <ul id="comments"></ul>\
+</div>'
     }
 }(window.pyca = window.pyca || {}, jQuery));

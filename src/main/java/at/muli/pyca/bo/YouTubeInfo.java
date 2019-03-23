@@ -32,6 +32,9 @@ public class YouTubeInfo {
     }
 
     public static YouTubeInfo fromVideo(Video video) {
+        if (video == null) {
+            return null;
+        }
         return builder()
                 .title(video.getTitle())
                 .url(video.getUrl())
