@@ -1,12 +1,20 @@
 (function(pyca, $, undefined) {
 
     let elements = {
+        back: $('#back'),
         content: $('#content'),
         author: $('#author'),
-        videos: $('#videos')
+        videos: $('#videos'),
+        mainContent: $('#main_content'),
+        addVideoButton: $('#add_video_button')
     };
 
-    $('a.nav-link').on('click', e => e.preventDefault());
+    elements.back.on('click', e => {
+        e.preventDefault();
+        $('.fullscreen-container').remove();
+        elements.content.show();
+        elements.addVideoButton.show();
+    });
 
     $(elements.videos).click('a.video-details', e => {
         e.preventDefault();
@@ -14,7 +22,17 @@
         if (!link.is('a')) {
             link = link.parents('a');
         }
-        $.get('/api' + link.attr('href')).done(data => console.log(data));
+        $.get('/api' + link.attr('href')).done((data, textStatus, xhr) => {
+            if (xhr.status !== 200) {
+                return;
+            }
+            let videoInfo = $(Mustache.render(templates.detailVideoContainer, data));
+            elements.mainContent.append(videoInfo);
+            elements.addVideoButton.hide();
+            elements.content.hide();
+            elements.back.removeClass('hide');
+            $('#comments').append($('<li>').html(templates.commentInput));
+        });
     });
 
     $('a.add-video').on('click', e => {
@@ -115,9 +133,21 @@
 </a>',
         detailVideoContainer: '<div class="fullscreen-container">\
     <h2><a href="{{url}}" target="_blank">{{title}}</a></h2>\
-    <span>{{author}}</span>\
-    <div class="video-container"><iframe src="{{embed}}" width="853" height="480" frameborder="0" allowfullscreen></div>\
+    <div class="right">{{author}}</div>\
+    <div class="clearfix"></div> \
+    <div class="video-container"><iframe src="{{embed}}" width="853" height="480" frameborder="0" allowfullscreen /></div>\
+    <h3>Comments</h3>\
     <ul id="comments"></ul>\
+</div>',
+        commentInput: '<div class="row">\
+    <div class="input-field col s10 m11">\
+        <i class="material-icons prefix">comment</i>\
+        <textarea id="comment" class="validate materialize-textarea" required></textarea>\
+        <label for="comment">New Comment</label>\
+    </div>\
+    <div class="input-field col s2 m1" id="add_video_button">\
+        <a class="btn-floating waves-effect waves-light light-blue darken-2 add-comment" id="add_comment"><i class="material-icons">send</i></a>\
+    </div>\
 </div>'
     }
 }(window.pyca = window.pyca || {}, jQuery));

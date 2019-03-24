@@ -16,3 +16,16 @@ main {
 #videos.collection a.collection-item.tag-existing {
     background-color: #c8e6c9;
 }
+
+.fullscreen-container {
+    background-color: #fff;
+    margin-bottom: 1rem;
+}
+
+.fullscreen-container h2 {
+    font-size: 2rem;
+}
+
+.fullscreen-container h3 {
+    font-size: 1.5rem;
+}
