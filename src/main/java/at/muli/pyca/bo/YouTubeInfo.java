@@ -20,6 +20,8 @@ public class YouTubeInfo {
 
     private String author;
 
+    private Long comments;
+
     public VideoPO toVideo() {
         return VideoPO.builder()
                 .author(author)
@@ -41,6 +43,7 @@ public class YouTubeInfo {
                 .embed(video.getEmbed())
                 .videoId(video.getVideoId())
                 .author(video.getAuthor())
+                .comments((long) video.getComments().size())
                 .build();
     }
 }

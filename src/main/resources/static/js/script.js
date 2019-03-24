@@ -158,7 +158,7 @@
     <div class="actions"><a class="btn waves-effect waves-light light-blue darken-2 save-video"><i class="material-icons right">save</i>Save </a></div>\
 </div>',
         listVideo: '<a class="collection-item video-details" href="/video/{{videoId}}" name="{{videoId}}">\
-    <span class="badge">0</span>\
+    <span class="badge">{{comments}}</span>\
     <span class="badge new green lighten-2">1</span>\
     <div class="title light-blue-text darken-2"><strong>{{title}}</strong></div>\
     <div class="light-blue-text darken-1">{{author}}</div>\
