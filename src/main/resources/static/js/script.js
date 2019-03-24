@@ -33,9 +33,18 @@
             elements.back.removeClass('hide');
             let comments = $('#comments');
             let countComments = 0;
+            let enhanceTime = commentEl => {
+                let added = $('.added', commentEl);
+                added
+                    .data('time', added.text())
+                    .attr('title', moment(added.text()).format('YYYY-MM-DD, HH:mm:ss'))
+                    .text(moment(added.text()).fromNow());
+            };
             $.get('/api/comments/' + data.videoId).done(data => {
                 $.each(data, (i, comment) => {
-                    comments.append(Mustache.render(templates.comment, comment));
+                    let commentEl = $(Mustache.render(templates.comment, comment));
+                    comments.append(commentEl);
+                    enhanceTime(commentEl);
                     countComments++;
                 });
                 data.comments = countComments;
@@ -65,7 +74,9 @@
                     processData: false
                 }).done((res, textStatus, xhr) => {
                     comment.val('');
-                    comments.prepend(Mustache.render(templates.comment, res));
+                    let newComment = $(Mustache.render(templates.comment, res));
+                    comments.prepend(newComment);
+                    enhanceTime(newComment);
                 });
                 saveAuthor();
             });
@@ -168,7 +179,6 @@
                     $('.new-comments', el).removeClass('hide').text(comments - seenComments);
                 }
             });
-            console.log(data);
         });
     };
 
@@ -201,6 +211,18 @@
         });
     });
 
+    setInterval(() => {
+        let added = $('.added');
+        added.each((i, el) => {
+            let $el = $(el);
+            let time = $el.data('time');
+            if (!time) {
+                return;
+            }
+            $el.text(moment(time).fromNow());
+        }, 500);
+    });
+
     let templates = {
         addVideo: '<div id="add_video_container">\
     <div class="input-field">\
@@ -224,7 +246,7 @@
     <div class="clearfix"></div> \
     <div class="video-container"><iframe src="{{embed}}" width="853" height="480" frameborder="0" allowfullscreen /></div>\
     <h3>Comments</h3>\
-    <ul id="comments"></ul>\
+    <ul id="comments" class="collection"></ul>\
 </div>',
         commentInput: '<div class="row">\
     <div class="input-field col s10 m11">\
@@ -236,10 +258,10 @@
         <a class="btn-floating waves-effect waves-light light-blue darken-2 add-comment" id="add_comment"><i class="material-icons">send</i></a>\
     </div>\
 </div>',
-        comment: '<li>\
+        comment: '<li class="collection-item">\
     <div class="title">\
         <span class="author">{{author}}</span>\
-        <span class="added">{{dateAdd}}</span>\
+        <span class="added right">{{dateAdd}}</span>\
     </div>\
     <div class="comment">{{text}}</div>\
 </li>'

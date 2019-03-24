@@ -29,3 +29,8 @@ main {
 .fullscreen-container h3 {
     font-size: 1.5rem;
 }
+
+.fullscreen-container .collection-item .title {
+    border-bottom: 1px dotted #ccc;
+    margin-bottom: .5rem;
+}
