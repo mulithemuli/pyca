@@ -1,6 +1,6 @@
 package at.muli.pyca.bo;
 
-import at.muli.pyca.po.Video;
+import at.muli.pyca.po.VideoPO;
 import lombok.Builder;
 import lombok.Value;
 
@@ -20,8 +20,8 @@ public class YouTubeInfo {
 
     private String author;
 
-    public Video toVideo() {
-        return Video.builder()
+    public VideoPO toVideo() {
+        return VideoPO.builder()
                 .author(author)
                 .embed(embed)
                 .title(title)
@@ -31,7 +31,7 @@ public class YouTubeInfo {
                 .build();
     }
 
-    public static YouTubeInfo fromVideo(Video video) {
+    public static YouTubeInfo fromVideo(VideoPO video) {
         if (video == null) {
             return null;
         }

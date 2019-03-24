@@ -1,7 +1,10 @@
 package at.muli.pyca.controller;
 
+import at.muli.pyca.bo.Comment;
 import at.muli.pyca.bo.YouTubeInfo;
-import at.muli.pyca.po.Video;
+import at.muli.pyca.po.CommentPO;
+import at.muli.pyca.po.VideoPO;
+import at.muli.pyca.repository.CommentRepository;
 import at.muli.pyca.repository.VideoRepository;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.Jsoup;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,13 +28,15 @@ public class YouTubeController {
 
     private VideoRepository videoRepository;
 
-    public YouTubeController(VideoRepository videoRepository) {
+    private CommentRepository commentRepository;
+
+    public YouTubeController(VideoRepository videoRepository, CommentRepository commentRepository) {
         this.videoRepository = videoRepository;
+        this.commentRepository = commentRepository;
     }
 
     @RequestMapping(path = "/video/{videoId}", method = RequestMethod.GET)
     public ResponseEntity<YouTubeInfo> loadVideoInfoById(@PathVariable("videoId") String videoId) {
-        log.info(videoId);
         YouTubeInfo youTubeInfo = YouTubeInfo.fromVideo(videoRepository.findByVideoId(videoId));
         if (youTubeInfo == null) {
             return ResponseEntity.notFound().build();
@@ -65,7 +71,7 @@ public class YouTubeController {
 
     @RequestMapping(path = "/video", method = RequestMethod.POST)
     public ResponseEntity<YouTubeInfo> saveVideo(@RequestBody YouTubeInfo youTubeInfo) {
-        Video video = videoRepository.findByVideoId(youTubeInfo.getVideoId());
+        VideoPO video = videoRepository.findByVideoId(youTubeInfo.getVideoId());
         if (video != null) {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
@@ -77,5 +83,26 @@ public class YouTubeController {
     @RequestMapping(path = "/videos", method = RequestMethod.GET)
     public List<YouTubeInfo> loadVideos() {
         return videoRepository.findAllByOrderByDateAddDesc().map(YouTubeInfo::fromVideo).collect(Collectors.toList());
+    }
+
+    @RequestMapping(path = "/comment", method = RequestMethod.POST)
+    public Comment saveComment(@RequestBody Comment comment) {
+        VideoPO video = videoRepository.findByVideoId(comment.getVideoId());
+        CommentPO commentPo = CommentPO.builder()
+                .text(comment.getText())
+                .author(comment.getAuthor())
+                .dateAdd(Instant.now())
+                .video(video)
+                .build();
+        commentRepository.save(commentPo);
+        return Comment.fromPo(commentPo);
+    }
+
+    @Transactional(readOnly = true)
+    @RequestMapping(path = "/comments/{videoId}", method = RequestMethod.GET)
+    public List<Comment> loadComments(@PathVariable("videoId") String videoId) {
+        return commentRepository.findAllByVideoOrderByDateAddDesc(videoRepository.findByVideoId(videoId))
+                .map(Comment::fromPo)
+                .collect(Collectors.toList());
     }
 }

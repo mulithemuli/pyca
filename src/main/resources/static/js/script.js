@@ -31,7 +31,39 @@
             elements.addVideoButton.hide();
             elements.content.hide();
             elements.back.removeClass('hide');
-            $('#comments').append($('<li>').html(templates.commentInput));
+            let comments = $('#comments');
+            $.get('/api/comments/' + data.videoId).done(data => {
+                $.each(data, (i, comment) => {
+                    comments.append(Mustache.render(templates.comment, comment));
+                });
+            });
+            $(templates.commentInput).insertAfter($('h3', videoInfo));
+            let addComment = $('#add_comment');
+            let comment = $('#comment');
+            addComment.on('click', e => {
+                e.preventDefault();
+                let author = storage.get('author');
+                let text = comment.val();
+                if (!author || !text) {
+                    M.toast({html: 'Comment and Author must be set.'});
+                }
+                let req = {
+                    author: author,
+                    text: text,
+                    videoId: data.videoId
+                };
+                $.ajax({
+                    url: '/api/comment',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(req),
+                    dataType: 'json',
+                    processData: false
+                }).done((res, textStatus, xhr) => {
+                    comment.val('');
+                    comments.prepend(Mustache.render(templates.comment, res));
+                });
+            });
         });
     });
 
@@ -148,6 +180,13 @@
     <div class="input-field col s2 m1" id="add_video_button">\
         <a class="btn-floating waves-effect waves-light light-blue darken-2 add-comment" id="add_comment"><i class="material-icons">send</i></a>\
     </div>\
-</div>'
+</div>',
+        comment: '<li>\
+    <div class="title">\
+        <span class="author">{{author}}</span>\
+        <span class="added">{{dateAdd}}</span>\
+    </div>\
+    <div class="comment">{{text}}</div>\
+</li>'
     }
 }(window.pyca = window.pyca || {}, jQuery));

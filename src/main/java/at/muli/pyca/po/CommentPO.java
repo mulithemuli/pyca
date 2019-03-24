@@ -12,8 +12,8 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class Video {
+@Entity(name = "comment")
+public class CommentPO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,15 +22,13 @@ public class Video {
     @Version
     private Long version;
 
-    private String url;
-
-    private String embed;
-
-    private String videoId;
-
-    private String title;
-
     private String author;
 
+    private String text;
+
     private Instant dateAdd;
+
+    @ManyToOne
+    @JoinColumn(name = "id_video", referencedColumnName = "id", nullable = false)
+    private VideoPO video;
 }
