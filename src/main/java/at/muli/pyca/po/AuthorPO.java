@@ -6,16 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.util.Collection;
-import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "video")
-public class VideoPO {
+@Entity(name = "author")
+public class AuthorPO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,21 +22,8 @@ public class VideoPO {
     @Version
     private Long version;
 
-    private String url;
+    private String name;
 
-    private String embed;
-
-    private String videoId;
-
-    private String title;
-
-    private String author;
-
-    private Instant dateAdd;
-
-    @OneToMany(mappedBy = "video")
-    private List<CommentPO> comments;
-
-    @OneToMany(mappedBy = "video")
+    @OneToMany(mappedBy = "author")
     private Collection<SeenCommentsPO> seenComments;
 }

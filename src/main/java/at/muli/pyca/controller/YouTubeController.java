@@ -1,10 +1,15 @@
 package at.muli.pyca.controller;
 
+import at.muli.pyca.bo.Author;
 import at.muli.pyca.bo.Comment;
 import at.muli.pyca.bo.YouTubeInfo;
+import at.muli.pyca.po.AuthorPO;
 import at.muli.pyca.po.CommentPO;
+import at.muli.pyca.po.SeenCommentsPO;
 import at.muli.pyca.po.VideoPO;
+import at.muli.pyca.repository.AuthorRepository;
 import at.muli.pyca.repository.CommentRepository;
+import at.muli.pyca.repository.SeenCommentsRepository;
 import at.muli.pyca.repository.VideoRepository;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.Jsoup;
@@ -30,9 +35,18 @@ public class YouTubeController {
 
     private CommentRepository commentRepository;
 
-    public YouTubeController(VideoRepository videoRepository, CommentRepository commentRepository) {
+    private AuthorRepository authorRepository;
+
+    private SeenCommentsRepository seenCommentsRepository;
+
+    public YouTubeController(VideoRepository videoRepository,
+                             CommentRepository commentRepository,
+                             AuthorRepository authorRepository,
+                             SeenCommentsRepository seenCommentsRepository) {
         this.videoRepository = videoRepository;
         this.commentRepository = commentRepository;
+        this.authorRepository = authorRepository;
+        this.seenCommentsRepository = seenCommentsRepository;
     }
 
     @RequestMapping(path = "/video/{videoId}", method = RequestMethod.GET)
@@ -104,5 +118,44 @@ public class YouTubeController {
         return commentRepository.findAllByVideoOrderByDateAddDesc(videoRepository.findByVideoId(videoId))
                 .map(Comment::fromPo)
                 .collect(Collectors.toList());
+    }
+
+    @RequestMapping(path = "/author", method = RequestMethod.PUT)
+    public ResponseEntity<Author> addAuthor(@RequestBody Author author) {
+        if (authorRepository.findByName(author.getName()) != null) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+        authorRepository.save(AuthorPO.builder().name(author.getName()).build());
+        return ResponseEntity.ok(author);
+    }
+
+    @RequestMapping(path = "/author", method = RequestMethod.POST)
+    public Author updateLastSeen(@RequestBody Author author) {
+        AuthorPO authorPO = authorRepository.findByName(author.getName());
+        author.getSeenComments().entrySet().stream().forEach(e -> {
+            VideoPO videoPO = videoRepository.findByVideoId(e.getKey());
+            SeenCommentsPO seenCommentsPO = seenCommentsRepository.findByAuthorAndVideo(authorPO, videoPO);
+            if (seenCommentsPO == null) {
+                seenCommentsPO = SeenCommentsPO.builder().video(videoPO).author(authorPO).build();
+            }
+            seenCommentsPO.setComments(e.getValue());
+            seenCommentsRepository.save(seenCommentsPO);
+        });
+        return author;
+    }
+
+    @RequestMapping(path = "/author/{author}", method = RequestMethod.GET)
+    public ResponseEntity<Author> loadAuthor(@PathVariable("author") String author) {
+        AuthorPO authorPO = authorRepository.findByName(author);
+        if (authorPO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(Author.builder()
+                .name(author)
+                .seenComments(authorPO.getSeenComments()
+                        .stream()
+                        .collect(Collectors.toMap(s -> s.getVideo().getVideoId(), SeenCommentsPO::getComments)))
+                .build());
+
     }
 }

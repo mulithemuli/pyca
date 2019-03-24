@@ -32,11 +32,15 @@
             elements.content.hide();
             elements.back.removeClass('hide');
             let comments = $('#comments');
+            let countComments = 0;
             $.get('/api/comments/' + data.videoId).done(data => {
                 $.each(data, (i, comment) => {
                     comments.append(Mustache.render(templates.comment, comment));
+                    countComments++;
                 });
+                data.comments = countComments;
             });
+            updateSeenComments(data);
             $(templates.commentInput).insertAfter($('h3', videoInfo));
             let addComment = $('#add_comment');
             let comment = $('#comment');
@@ -63,6 +67,7 @@
                     comment.val('');
                     comments.prepend(Mustache.render(templates.comment, res));
                 });
+                saveAuthor();
             });
         });
     });
@@ -118,6 +123,7 @@
                         }
                         $(addVideoContainer).remove();
                     });
+                    saveAuthor();
                 })
             });
         });
@@ -136,6 +142,54 @@
         this.get = k => store[k];
     };
 
+    let saveAuthor = () => {
+        $.ajax({
+            url: '/api/author',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ name: storage.get('author') }),
+            dataType: 'json',
+            processData: false
+        });
+    };
+
+    let markUnseenComments = () => {
+        if (!storage.get('author')) {
+            return;
+        }
+        $.get('/api/author/' + storage.get('author')).done((data, textStatus, xhr) => {
+            if (xhr.status !== 200) {
+                return;
+            }
+            $('a', elements.videos).each((i, el) => {
+                let seenComments = data.seenComments[$(el).data('videoId')] || 0;
+                let comments = $('.count-comments', el).text();
+                if (comments - seenComments > 0) {
+                    $('.new-comments', el).removeClass('hide').text(comments - seenComments);
+                }
+            });
+            console.log(data);
+        });
+    };
+
+    let updateSeenComments = video => {
+        if (!storage.get('author')) {
+            return;
+        }
+        let seenComments = {};
+        seenComments[video.videoId] = video.comments;
+        $.ajax({
+            url: '/api/author',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ name: storage.get('author'), seenComments: seenComments }),
+            dataType: 'json',
+            processData: false
+        }).done(() => {
+            markUnseenComments();
+        });
+    };
+
     $(() => {
         elements.author.val(storage.get('author'));
         M.updateTextFields();
@@ -143,6 +197,7 @@
             $.each(videos, (i, video) => {
                 elements.videos.append($(Mustache.render(templates.listVideo, video)));
             });
+            markUnseenComments();
         });
     });
 
@@ -157,9 +212,9 @@
     <div class="video-container hide"></div>\
     <div class="actions"><a class="btn waves-effect waves-light light-blue darken-2 save-video"><i class="material-icons right">save</i>Save </a></div>\
 </div>',
-        listVideo: '<a class="collection-item video-details" href="/video/{{videoId}}" name="{{videoId}}">\
-    <span class="badge">{{comments}}</span>\
-    <span class="badge new green lighten-2">1</span>\
+        listVideo: '<a class="collection-item video-details" href="/video/{{videoId}}" name="{{videoId}}" data-video-id="{{videoId}}">\
+    <span class="badge count-comments">{{comments}}</span>\
+    <span class="badge new green lighten-2 hide new-comments">0</span>\
     <div class="title light-blue-text darken-2"><strong>{{title}}</strong></div>\
     <div class="light-blue-text darken-1">{{author}}</div>\
 </a>',
