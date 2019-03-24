@@ -241,8 +241,7 @@
     <div class="light-blue-text darken-1">{{author}}</div>\
 </a>',
         detailVideoContainer: '<div class="fullscreen-container">\
-    <h2><a href="{{url}}" target="_blank">{{title}}</a></h2>\
-    <div class="right">{{author}}</div>\
+    <h2><a href="{{url}}" target="_blank">{{title}}</a> <div class="author right">{{author}}</div></h2>\
     <div class="clearfix"></div> \
     <div class="video-container"><iframe src="{{embed}}" width="853" height="480" frameborder="0" allowfullscreen /></div>\
     <h3>Comments</h3>\
