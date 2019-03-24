@@ -11,10 +11,18 @@
 
     elements.back.on('click', e => {
         e.preventDefault();
+        let home = location.toString().replace(location.pathname, '');
+        history.pushState({ url : home }, null, home);
+        mainPage();
+    });
+
+    let mainPage = () => {
         $('.fullscreen-container').remove();
         elements.content.show();
         elements.addVideoButton.show();
-    });
+        elements.back.hide();
+        updateSeenComments();
+    };
 
     $(elements.videos).click('a.video-details', e => {
         e.preventDefault();
@@ -22,7 +30,12 @@
         if (!link.is('a')) {
             link = link.parents('a');
         }
-        $.get('/api' + link.attr('href')).done((data, textStatus, xhr) => {
+        loadVideo(link.attr('href'));
+        history.pushState({ url: location.toString().replace(location.pathname, '') + link.attr('href') }, null,  link.attr('href'));
+    });
+
+    let loadVideo = video => {
+        $.get('/api' + video).done((data, textStatus, xhr) => {
             if (xhr.status !== 200) {
                 return;
             }
@@ -31,6 +44,7 @@
             elements.addVideoButton.hide();
             elements.content.hide();
             elements.back.removeClass('hide');
+            elements.back.show();
             let comments = $('#comments');
             let countComments = 0;
             let enhanceTime = commentEl => {
@@ -81,7 +95,7 @@
                 saveAuthor();
             });
         });
-    });
+    };
 
     $('a.add-video').on('click', e => {
         e.preventDefault();
@@ -209,6 +223,9 @@
             });
             markUnseenComments();
         });
+        if (location.pathname !== '/') {
+            loadVideo(location.pathname);
+        }
     });
 
     setInterval(() => {
@@ -222,6 +239,17 @@
             $el.text(moment(time).fromNow());
         }, 500);
     });
+
+    history.replaceState({ url: location.href }, null, location.href);
+
+    onpopstate = e => {
+        let url = new URL(e.state.url);
+        if (url.pathname === '/') {
+            mainPage();
+        } else {
+            loadVideo(url.pathname);
+        }
+    };
 
     let templates = {
         addVideo: '<div id="add_video_container">\
